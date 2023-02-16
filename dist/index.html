@@ -1,3 +1,20 @@
+<script>
+  //register the service worker
+if ('serviceWorker' in navigator) {
+ window.addEventListener('load', () => {
+  navigator.serviceWorker.addEventListener('message',event =>{
+   if (event.data.action === 'refresh'){
+       window.location.reload()
+   }
+  });
+     navigator.serviceWorker.register('/dist/js/service_worker.js').then(registration => {
+        console.log('SW registered: ', registration);
+     }).catch(registrationError => {
+      console.log('Service Worker not supported');
+     });
+  });
+}
+</script>
 <!DOCTYPE html>
 <html lang="en-gb" dir="ltr">
 
@@ -24,7 +41,7 @@
         <a class="uk-navbar-item uk-logo" href="index.html"><img class="mb-4" src="littleGreenLogo_180x.webp" alt="" width="100" height="100"></a>
         <ul class="uk-navbar-nav uk-visible@m uk-margin-large-left">
           <li class="uk-active"><a href="index.html">Home</a></li>
-          <li ><a href="search.html">Search</a></li>
+          <!-- <li ><a href="search.html">Search</a></li> -->
           <li ><a href="contact.html">Contact</a></li>
           <li > <a href = "aboutUs.html">About Us</a></li>
           <li><a href="visitUs.html">Visit Us</a></li>
@@ -33,7 +50,7 @@
       </div>
       <div class="uk-navbar-right">
         <div>
-          <a class="uk-navbar-toggle" data-uk-search-icon href="#"></a>
+          <a class="uk-navbar-toggle uk-visible@m" data-uk-search-icon href="#"></a>
           <div class="uk-drop uk-background-default" data-uk-drop="mode: click; pos: left-center; offset: 0">
             <form class="uk-search uk-search-navbar uk-width-1-1">
               <input class="uk-search-input uk-text-demi-bold" type="search" placeholder="Search..." autofocus>
@@ -44,7 +61,7 @@
           <li ><a href="Likepage.html">Saved</a></li>
         </ul>
          <div class="uk-navbar-item">
-          <div><a class="uk-button uk-button-primary" href="loginpage.html">Sign In</a></div>
+          <div><a class="uk-button uk-button-primary uk-visible@m" href="loginpage.html">Sign In</a></div>
         </div>          
         <a class="uk-navbar-toggle uk-hidden@m" href="#offcanvas" data-uk-toggle><span
           data-uk-navbar-toggle-icon></span></a>
@@ -116,7 +133,7 @@
               <li class="uk-parent uk-open">
                 <a>Dish Type</a>
                 <ul class="uk-nav-sub">
-                  
+                  <li><a>Salad</a></li>                
                 </ul>
               </li>
               <li class="uk-parent">
@@ -128,25 +145,23 @@
               <li class="uk-parent">
                 <a>Diet and Health</a>
                 <ul class="uk-nav-sub">
-                  <li><a>Gluten Free</a></li>
-                  <li><a>Low Calorie</a></li>
                   <li><a>Healthy</a></li>
-                  <li><a>High Fiber Recipes</a></li>                
+                  <li><a>Vegetarian</a></li>                              
                 </ul>
               </li>
               <li class="uk-parent">
                 <a>World Cuisine</a>
                 <ul class="uk-nav-sub">
-                  <li><a>Chinese</a></li>
                   <li><a>IndianCuisine</a></li>
-                  <li><a>Mexican</a></li>
+                  <li><a>ItalianCuisine</a></li>
+                  <li><a>MiddleEasternCuisine</a></li>
                 </ul>
               </li>
               <li class="uk-parent">
                 <a>Seasonal</a>
                 <ul class="uk-nav-sub">
-                  <li><a>Baby Shower</a></li>
-                  <li><a>Halloween</a></li>
+                  <!-- <li><a>Baby Shower</a></li>
+                  <li><a>Halloween</a></li> -->
                 </ul>
               </li>
             </ul>
@@ -935,7 +950,7 @@
     <ul class="uk-nav uk-nav-primary uk-nav-offcanvas uk-margin-medium-top uk-text-center">
       <li class="uk-active"><a href="index.html">Home</a></li>
       <!-- <li ><a href="recipe.html">Recipe</a></li> -->
-      <li ><a href="search.html">Search</a></li>
+      <!-- <li ><a href="search.html">Search</a></li> -->
       <li ><a href="contact.html">Contact</a></li>
       <li ><a href="aboutUs.html">About Us</a></li>
       <li ><a href="Likepage.html">Saved</a></li>
@@ -958,7 +973,6 @@
     </div>
   </div>
   <script src="/src/js/index.js"></script>
-  <script src="/src/js/subscribe.js"></script>
 </body>
 
 </html>

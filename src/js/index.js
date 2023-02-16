@@ -28,13 +28,8 @@ fetchPromise
     console.log(data);
     const recipe = data;
     const recipeList = document.querySelector('#recipe-list');
-    // const categories = document.querySelector('#categories');
     recipe.forEach(recipe => {
         const resizedImage = `data:image/png;base64,${recipe.image}`;
-        // const tags = recipe.tags;
-        // const tagsArray = tags.split(',');
-        // const tag = tagsArray[1];
-        // console.log('tag:' + tag);
         let html = '';
         try{
             html += `<div>

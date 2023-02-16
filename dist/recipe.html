@@ -1,3 +1,20 @@
+<script>
+  //register the service worker
+if ('serviceWorker' in navigator) {
+ window.addEventListener('load', () => {
+  navigator.serviceWorker.addEventListener('message',event =>{
+   if (event.data.action === 'refresh'){
+       window.location.reload()
+   }
+  });
+     navigator.serviceWorker.register('/dist/js/service_worker.js').then(registration => {
+        console.log('SW registered: ', registration);
+     }).catch(registrationError => {
+      console.log('Service Worker not supported');
+     });
+  });
+}
+</script>
 <!DOCTYPE html>
 <html lang="en-gb" dir="ltr">
 
@@ -230,8 +247,7 @@
   </div>
 </div>
 <script src="/src/js/recipe.js"></script>
-<script src="/src/js/filter.js"></script>
-<script src="/src/js/save.js"></script>
+<!-- <script src="/src/js/save.js"></script> -->
 </body>
 
 </html>

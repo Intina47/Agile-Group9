@@ -5,9 +5,9 @@ const PORT = 8800;
 const rateLimiter = require('rate-limiter-flexible');
 const nodemailer = require('nodemailer');
 const validator = require('email-validator');
-const bycrypt = require('bcrypt');
-const tedious = require('tedious');
 const db = require('mssql');
+const NodeCache = require("node-cache");
+const cache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 const Buffer = require('buffer').Buffer;
 const sharp = require('sharp');
 // const connection = require('mssql')
@@ -25,12 +25,17 @@ port: 1433
 }
 
 app.get('/recipes', (req, res) => {
+    let recipes = cache.get('recipes');
+    if(recipes){
+        console.log('Recipes successfully retrieved from cache');
+            return res.status(200).send(recipes);
+    }
     db.connect(config, (err) => {
       if (err) {
         console.error('Error connecting to database:', err);
         return res.status(500).send({ error: 'Error connecting to database' });
       }
-      console.log('Connected to database');
+      console.log(req.connection.remoteAddress, 'Successfully Connected to database');
       //create a new request object
       let sqlRequest = new db.Request();
       //query the database and get the records
@@ -48,9 +53,7 @@ app.get('/recipes', (req, res) => {
         Promise.all(Recipes)
         .then(Recipes => {
             console.log('Recipes successfully retrieved from database');
-            console.log('##########################################');
-            console.log(Recipes);
-            console.log('##########################################');
+            cache.set('recipes', Recipes);
             res.status(200).send(Recipes);
             db.close();
         })
@@ -68,11 +71,21 @@ app.post('/details', (req,res) =>{
     if(!id){
         console.log('No id provided');
     }
-    console.log(id);
-    getRecipeDetails(id, res);
+    const cacheKey = `recipe_details_${id}`;
+    //check if the results is in the cache
+    cache.get(cacheKey, (err, value)=>{
+        if (!err && value) {
+            console.log('Data retrieved from cache');
+            console.log(value);
+            return res.status(200).send(value);
+        }
+        //query database
+        getRecipeDetails(id, res, cacheKey);
+    })
+    getRecipeDetails(id, res, cacheKey);
 });
         //query the database and get the records
-        async function getRecipeDetails(id, res){
+        async function getRecipeDetails(id, res, cacheKey){
             try {
                 await db.connect(config);
                 console.log('Connected to database');
@@ -103,6 +116,12 @@ app.post('/details', (req,res) =>{
                     ingredientDetails
                 };
                 console.log('Recipe details successfully retrieved from database');
+                //store result in the cache
+                cache.set(cacheKey, results, (err,success)=>{
+                    if(!err && success){
+                        console.log('Recipe details successfully stored in cache');
+                    }
+                });
                 return res.status(200).send(results);
             
         }
@@ -123,7 +142,7 @@ app.post('/subscribe', (req, res) => {
             console.error('Error connecting to database:', err);
             return res.status(500).send({ error: 'Error connecting to database' });
         }
-        console.log('Connected to database');
+        console.log(req.connection.remoteAddress, 'Successfully Connected to database');
         //create a new request object
         let sqlRequest = new db.Request();
         //query the database and get the records
@@ -152,7 +171,7 @@ app.post('/filter', (req, res) => {
             console.error('Error connecting to database:', err);
             return res.status(500).send({ error: 'Error connecting to database' });
         }
-        console.log('Connected to database');
+        console.log(req.connection.remoteAddress, 'Successfully Connected to database');
         //create a new request object
         let sqlRequest = new db.Request();
         //query the database and get the records
@@ -217,6 +236,9 @@ app.get('/src/js/save.js',(req, res) => {
 });
 app.get('//src/js/morelike.js',(req, res) => {
     res.sendFile(path.join(__dirname, '/src/js/morelike.js'));
+});
+app.get('/dist/js/service_worker.js',(req, res) => {
+    res.sendFile(path.join(__dirname, '/dist/js/service_worker.js'));
 });
 //alow user to send upto 100 messages under an hour
 const limiter = new rateLimiter.RateLimiterMemory({
